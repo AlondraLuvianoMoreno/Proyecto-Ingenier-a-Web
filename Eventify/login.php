@@ -1,6 +1,21 @@
 <?php
 session_start();
 include("include/connect.php");
+    $aid = $_SESSION['aid'] ?? -1;
+
+if ($aid > 0) {
+   header("Location: index.php");
+     exit();
+}
+
+if (isset($_SESSION['login_message'])) {
+    echo "
+    <div style=' background:#f8d7da; color:#721c24; padding:12px; margin-bottom:15px; border-radius:6px; border:1px solid #f5c6cb;'>
+        {$_SESSION['login_message']}
+    </div>
+    ";
+    unset($_SESSION['login_message']);
+}
 
 if (isset($_POST['submit'])) {
 
@@ -16,7 +31,7 @@ if (isset($_POST['submit'])) {
         $row = mysqli_fetch_assoc($result);
 
         if (!password_verify($password, $row['password'])) {
-            echo "<script>alert('Contraseña incorrecta.');</script>";
+            echo "<script>alert('Contraseña incorrecta.');window.location.href='login.php';</script>";
             exit();
         }
 
@@ -37,7 +52,7 @@ if (isset($_POST['submit'])) {
         exit();
 
     } else {
-        echo "<script>alert('Usuario no encontrado.');</script>";
+        echo "<script>alert('Usuario no encontrado.'); window.location.href='login.php';</script>";
     }
 }
 ?>
@@ -46,7 +61,6 @@ if (isset($_POST['submit'])) {
 <!DOCTYPE html>
 <html lang="en">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="script.js"></script>
 
 <head>
     <meta charset="UTF-8" />
@@ -54,9 +68,33 @@ if (isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eventify</title>
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
-    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
 
     <link rel="stylesheet" href="style.css" />
+
+        <style>
+
+.password-wrapper {
+    position: relative;
+    width: 30%;
+    margin: 40px auto;
+    min-height:50px;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 35px;  
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 5px;
+    top: 13px;
+    cursor: pointer;
+    color: #555;
+    font-size: 16px;
+}
+    
+    </style>
 
 </head>
 
@@ -67,11 +105,12 @@ if (isset($_POST['submit'])) {
         <div>
             <ul id="navbar">
                 <li><a href="index.php">Inicio</a></li>
-                <li><a href="shop.php">Conciertos</a></li>
-                <li><a href="about.php">Festivales</a></li>
+                <li><a href="shop.php">Eventos</a></li>
+                <li><a href="about.php">Acerca de nosotros</a></li>
+                <li><a class="active" href="login.php">Iniciar sesión</a></li>
                 <li><a href="signup.php">Registrarse</a></li>
                 <li id="lg-bag">
-                    <a href="cart.php"><i class="far fa-shopping-bag"></i></a>
+                    <a href="cart.php"><i class="far fa-shopping-cart"></i></a>
                 </li>
                 <a href="#" id="close"><i class="far fa-times"></i></a>
             </ul>
@@ -82,7 +121,10 @@ if (isset($_POST['submit'])) {
     <form method="post" id="form">
         <h2 style="color: blue; margin: auto">Iniciar sesión</h2>
         <input class="input1" id="user" name="username" type="text" placeholder="Usuario *">
-        <input class="input1" id="pass" name="password" type="password" placeholder="Contraseña *">
+        <div class="password-wrapper">
+        <input class="input1" id="pass" name="password" type="password" placeholder="Contraseña *" required='required'>
+        <i class="far fa-eye toggle-eye" id="togglePass"></i>
+        </div>
         <button type="submit" class="btn" name="submit">Ingresar</button>
 
     </form>
@@ -138,15 +180,31 @@ if (isset($_POST['submit'])) {
     </footer>
 
     <script src="script.js"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (!input || !icon) return;
+
+        icon.addEventListener("click", () => {
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        });
+    }
+
+    togglePassword("pass", "togglePass");
+    togglePassword("cpass", "toggleCPass");
+});
+</script>
 </body>
 
 </html>
-
-<script>
-window.addEventListener("unload", function() {
-  // Call a PHP script to log out the user
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "logout.php", false);
-  xhr.send();
-});
-</script>
