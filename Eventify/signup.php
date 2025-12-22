@@ -1,5 +1,13 @@
 <?php
+session_start();
 include("include/connect.php");
+
+    $aid = $_SESSION['aid'] ?? -1;
+
+    if ($aid > 0) {
+        header("Location: index.php");
+        exit();
+    }
 
 if (isset($_POST['submit'])) {
     $firstname = $_POST['firstName'];
@@ -68,6 +76,30 @@ if (isset($_POST['submit'])) {
 
     <link rel="stylesheet" href="style.css" />
 
+    <style>
+
+.password-wrapper {
+    position: relative;
+    width: 30%;
+    margin: 40px auto;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 35px;  /* espacio para el ojo */
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 5px;
+    top:13px;
+    cursor: pointer;
+    color: #555;
+    font-size: 16px;
+}
+    
+    </style>
+
 </head>
 
 <body>
@@ -77,11 +109,12 @@ if (isset($_POST['submit'])) {
         <div>
             <ul id="navbar">
                 <li><a href="index.php">Inicio</a></li>
-                <li><a href="shop.php">Conciertos</a></li>
-                <li><a href="about.php">Festivales</a></li>
+                <li><a href="shop.php">Eventos</a></li>
+                <li><a href="about.php">Acerca de nosotros</a></li>
                 <li><a href="login.php">Iniciar sesión</a></li>
+                <li><a class="active" href="signup.php">Registrarse</a></li>
                 <li id="lg-bag">
-                    <a href="cart.php"><i class="far fa-shopping-bag"></i></a>
+                    <a href="cart.php"><i class="far fa-shopping-cart"></i></a>
                 </li>
                 <a href="#" id="close"><i class="far fa-times"></i></a>
         </div>
@@ -95,11 +128,22 @@ if (isset($_POST['submit'])) {
         <input class="input1" id="ln" name="lastName" type="text" placeholder="Apellido *" required="required">
         <input class="input1" id="user" name="username" type="text" placeholder="Username *" required="required">
         <input class="input1" id="email" name="email" type="text" placeholder="Correo electrónico *" required="required">
-        <input class="input1" id="pass" name="password" type="password" placeholder="Contraseña *" required="required">
-        <input class="input1" id="cpass" name="confirmPassword" type="password" placeholder="Confirma contraseña *"
-            required="required">
-        <input class="input1" id="dob" name="dob" type="date" placeholder="Fecha de nacimiento " required="required">
-        <input class="input1" id="contact" name="phone" type="number" placeholder="Número *" required="required">
+        <div id="email-msg" style="font-size: 14px; margin-top: -10px; margin-bottom: 10px;"></div>
+        <div class="password-wrapper">
+            <input class="input1" id="pass" name="password" type="password" placeholder="Contraseña *" required='required'>
+            <i class="far fa-eye toggle-eye" id="togglePass"></i>
+        </div>
+
+        <div class="password-wrapper">
+            <input class="input1" id="cpass" name="confirmPassword" type="password" placeholder="Confirma contraseña *" required='required'>
+            <i class="far fa-eye toggle-eye" id="toggleCPass"></i>
+        </div>
+        <div id="cpass-msg" style="font-size: 14px; margin-top: -10px; margin-bottom: 10px;"></div>
+        <label for="dob" style="font-size:14px; color:#555;">Fecha de nacimiento *</label>
+        <input class="input1" id="dob" name="dob" type="date" required>
+        <input class="input1" id="contact" name="phone" type="number" placeholder="Número *" maxlengrh="0" required="required">
+        <div id="phone-msg" style="font-size: 14px; margin-top: -10px; margin-bottom: 10px;"></div>
+
         <select class="select1" id="role" name="role" required="required">
             <option value="cliente">Cliente</option>
             <option value="admin">Administrador</option>
@@ -144,12 +188,3 @@ if (isset($_POST['submit'])) {
 </body>
 
 </html>
-
-<script>
-window.addEventListener("unload", function() {
-  // Call a PHP script to log out the user
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "logout.php", false);
-  xhr.send();
-});
-</script>
