@@ -220,19 +220,17 @@ if (isset($_GET['c'])) {
         <div>
             <ul id="navbar">
                 <li><a href="index.php">Inicio</a></li>
-                <li><a href="shop.php">Conciertos</a></li>
-                <li><a href="about.php">Festivales</a></li>
-                <li><a href='profile-admin.php'>Perfil</a></li>
+                <li><a href="shop.php">Eventos</a></li>
+                <li><a href="about.php">Acerca de nosotros</a></li>
+                <li><a href='profile.php'>Perfil</a></li>
+                <li><a href='profile.php?lo=1'>Cerrar sesión</a></li>
                 <li id="lg-bag">
-                    <a href="cart.php"><i class="far fa-shopping-bag"></i></a>
+                    <a href="cart.php"><i class="far fa-shopping-cart"></i></a>
                 </li>
                 <a href="#" id="close"><i class="far fa-times"></i></a>
             </ul>
         </div>
-        <div id="mobile">
-            <a href="cart.php"><i class="far fa-shopping-bag"></i></a>
-            <i id="bar" class="fas fa-outdent"></i>
-        </div>
+
     </section>
 
     <div class="navbar-top">
@@ -280,7 +278,7 @@ if (isset($_GET['c'])) {
         ?>
             <div class="sidenav-url">
                 <div class="url">
-                    <a href='profile.php?lo=1' class="btn logup">Cerrar sesión</a>
+                    <a href='orders.php' class="btn logup">Mis pedidos</a>
                     <hr allign="center">
                 </div>
                 <div class="url">
@@ -293,7 +291,7 @@ if (isset($_GET['c'])) {
                     <hr allign="center">
                 </div>
                 <div class="url">
-                    <a href='payments.php' class="btn logup">Agregar método de pago</a>
+                    <a href='payments.php' class="btn logup">Editar métodos de pago</a>
                     <hr allign="center">
                 </div>
                 <?php
@@ -369,7 +367,7 @@ if (isset($_GET['c'])) {
               </tr>
 
               <tr>
-              <td><button name='submit' type='submit' class='btn' style='width: 50%;'>Submit</button></td>
+              <td><button name='submit' type='submit' class='btn' style='width: 50%;'>Actualizar</button></td>
 
               </tr>
               </form>
@@ -409,7 +407,8 @@ if (isset($_GET['c'])) {
                 $ultimos4 = substr($tarjetaPrincipal['numero_tarjeta'], -4);
                 $metodoPagoPrincipal = "{$tarjetaPrincipal['titular']} - **** $ultimos4 (Vence {$tarjetaPrincipal['vencimiento']})";
                 }
-
+                
+                $direccionCompleta = "No registrado";
 
                 // Construir la dirección completa
                 if (!empty($direccionPrincipal)) {
@@ -475,18 +474,18 @@ if (isset($_GET['c'])) {
         $query = "select * from `order-details` where oid = $oid";
         $result = mysqli_query($con, $query);
 
-        echo "<h2>Review</h2>
+        echo "<h2>Reseña</h2>
                   <div class='card'>
                   <div class='card-body'>
                       <i class='fa fa-pen fa-xs edit'></i>
                       <div class='tb' style: 'height: 700px; max-height: 700px;'>
                       <form method='post'> <table style='display:table; max-height: 700px;' class='tb'><thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Image</th>
-                  <th>Price</th>
-                  <th>Review</th>
-                  <th>Rating</th>
+                  <th>Nombre</th>
+                  <th>Imagen</th>
+                  <th>Precio</th>
+                  <th>Comentarios</th>
+                  <th>Calificación</th>
                 </tr>
                 </thead><tbody>";
 
@@ -520,83 +519,16 @@ if (isset($_GET['c'])) {
                     </td>
                   </tr><script>bruh(`$pid`);</script>";
         }
-        echo "</tbody></table><div class='asd'><button type='submit' name='abc' class = 'btn' >Submit</button></div>
+        echo "</tbody></table><div class='asd'><button type='submit' name='abc' class = 'btn' >Actualizar</button></div>
                 </form></tbody>
                   </table>
               </div>
           </div>
          
      ";
-      } else {
-        echo "<h2>Información de órdenes</h2>
-                <div class='card'>
-                <div class='card-body'>
-                    <i class='fa fa-pen fa-xs edit'></i>
-                    <div class='tb'>
-                        <table style='display:table;' class='tb'>
-                            <thead>
-                                <tr>
-                                    <th>Orden ID</th>
-                                    <th>Fecha de orden</th>
-                                    <th>Fecha de entrega</th>
-                                    <th>Costo total</th>
-                                    <th>Dirección</th>
-                                    <th>Calificación y reseña</th>
-                                </tr>
-                            </thead>
-                            <tbody>";
-
-        include("include/connect.php");
-
-        $aid = $_SESSION['aid'];
-
-        $query = "SELECT * FROM orders join accounts on orders.aid = accounts.aid where orders.aid = $aid";
-
-
-        $result = mysqli_query($con, $query);
-
-        while ($row = mysqli_fetch_assoc($result)) {
-          $oid = $row['oid'];
-          $dateod = $row['dateod'];
-          $datedel = $row['datedel'];
-          $add = $row['address'];
-          $pri = $row['total'];
-          if (empty($datedel))
-            $datedel = "No enviado aún.";
-          echo "
-
-
-                <tr>
-                <td>$oid</td>
-                    <td>$dateod</td>
-                    <td>$datedel</td>
-                    <td>$pri</td>
-                <td style='max-width: 300px; max-height: 100px; overflow-x: auto; overflow-y: auto;'>$add</td>
-                ";
-          if ($datedel != "No enviado aún.") {
-
-            $query1 = "select* from reviews where oid = $oid";
-            $r = mysqli_query($con, $query1);
-            $w = mysqli_fetch_assoc($r);
-            if (empty($w))
-              echo "<td><a href='profile.php?odd=$oid'><button class='insert-btn'>Reseña</button></a></td>";
-            else
-              echo "<td>Calificado</td>";
-          }
-          echo "</tr>";
-        }
-
-        echo "</tbody>
-                  </table>
-              </div>
-          </div>
-      </div>";  // ← AQUÍ TERMINA INFORMACIÓN DE ÓRDENES
-      }
+      } 
 
       ?>
-
-
-
 
     </div>
 
@@ -666,6 +598,17 @@ if (isset($_GET['c'])) {
         }
         </script>
 
+<div id="orderModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeOrderModal()">&times;</span>
+
+    <h2>Detalle del pedido</h2>
+
+    <div id="orderModalContent">
+        <!-- Aquí se carga la info con AJAX -->
+    </div>
+  </div>
+</div>
 
 
 </body>
